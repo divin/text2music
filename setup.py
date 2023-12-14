@@ -13,6 +13,7 @@ if __name__ == "__main__":
         "gradio",
         "transformers",
         "scipy",
+        "accelerate",
     ]
     extras_require = {
         "development": ["isort", "mypy", "black", "Flake8-pyproject", "pytest", "pytest-cov"]
