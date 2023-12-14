@@ -1,0 +1,51 @@
+# A push to the development branch performs the various code styling and testing checks.
+name: 👀 Code Quality
+
+on:
+  push:
+    branches:
+      - "development"
+    paths:
+      - "**.py"
+  
+jobs:
+  code-quality:
+    
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+
+    steps:
+      
+      - name: 🔭 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        timeout-minutes: 5
+        with:
+          python-version-file: .python-version
+      
+      - name: 🛠 Install Dependencies
+        run: |
+            pip install -r pip-requirements.txt
+            pip install -e .[development]
+      
+      - name: 🔬 Analyse Import Order with iSort
+        run: |
+          isort --resolve-all-configs --check-only $(git ls-files "*.py")
+      
+      - name: 🔬 Analyse Code Style with Black
+        run: |
+          black --config pyproject.toml --check $(git ls-files "*.py")
+
+      - name: 🔬 Analyse Code Formatting with Flake8
+        run: |
+          flake8 --toml-config pyproject.toml $(git ls-files "*.py")
+      
+      - name: 🔬 Analyse Type Hinting with MyPy
+        run: |
+          mypy $(git ls-files "*.py")
+
+      - name: 🔬 Test with PyTest
+        run: |
+          pytest tests/

@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "text2music"
 dynamic = ["version", "scripts", "dependencies", "description", "optional-dependencies", "requires-python"]
@@ -7,19 +11,21 @@ line-length = 100
 
 [tool.flake8]
 exclude = [
-    ".git/",
-    "__pycache__/",
+    ".git/", # No need to traverse our git directory
+    "__pycache__/", # There's no value in checking cache directories
+    "build/",
+    "dist/",
 ]
 
 extend-ignore = [
-    "E203",
-    "E501",
-    "W503",
+    "E203", # Disable E203 "whitespace before ':'" to not enforce equal amount of whitespace around slice operators; Necessary for Black
+    "E501", # E501 ignored to allow lines longer than max-line-length if reasonable
+    "W503", # Disable W503 "line break before binary operator" as Black breaks lines before a binary operator; Necessary for Black
 ]
 
 import-order-style = "google"
-max-line-length = 100
-select = ["C", "E", "F", "W", "B", "B950"]
+max-line-length = 100 # Currently recommended line length based on screen resolutions and viewing code side by side
+select = ["C", "E", "F", "W", "B", "B950"] # Flake8 and black compatibility, e.g. regarding Bugbear's opinionated checks
 per-file-ignores = [
     "__init__.py:F401",
 ]
@@ -28,3 +34,7 @@ per-file-ignores = [
 profile = "black"
 line_length = 100
 force_single_line = true
+
+[tools.mypy]
+warn_return_any = true
+warn_unused_configs = true

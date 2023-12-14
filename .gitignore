@@ -1,3 +1,11 @@
+__pycache__/
+*.egg-info
+build/
+dist/
+.vscode/
+.pytest_cache/
+.mypy_cache/
+.venv/
+.DS_Store
 generated_audio/
 *.wav
-.DS_Store

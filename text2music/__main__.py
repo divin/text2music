@@ -1,20 +1,23 @@
 import os
 
-import gradio as gr
-import scipy
+import gradio as gr  # type: ignore
+import scipy  # type: ignore
 import torch
 from diffusers import MusicLDMPipeline
 
+from .constants import DESCRIPTION
+
+
+def get_fixed_file_name(file_name: str) -> str:
+    """Fix the file name to avoid errors"""
+    file_name = file_name.replace(" ", "_")
+    file_name = file_name.replace(".wav", "")
+    file_name = file_name.replace(".", "_")
+    file_name = file_name.replace(",", "_")
+    return file_name
+
 
 def get_app() -> gr.Interface:
-    def _get_fixed_file_name(file_name: str) -> str:
-        """Fix the file name to avoid errors"""
-        file_name = file_name.replace(" ", "_")
-        file_name = file_name.replace(".wav", "")
-        file_name = file_name.replace(".", "_")
-        file_name = file_name.replace(",", "_")
-        return file_name
-
     def _generate_audio(
         prompt: str,
         negative_prompt: str,
@@ -27,9 +30,8 @@ def get_app() -> gr.Interface:
         """Generate music from text"""
         num_inference_steps = int(num_inference_steps)
         audio_length_in_s = int(audio_length_in_s)
-        file_name = _get_fixed_file_name(file_name=file_name)
+        file_name = get_fixed_file_name(file_name=file_name)
         file_path = f"generated_audio/{file_name}.wav"
-        print(audio_length_in_s)
         data = text2music(
             prompt=prompt,
             negative_prompt=negative_prompt,
@@ -54,22 +56,11 @@ def get_app() -> gr.Interface:
     text2music = text2music.to(device)
 
     # Create the app
-    with gr.Blocks(title="Text to Music") as app:
-        gr.Markdown("# Text to Music")
+    with gr.Blocks(title="🎵 Text2Music") as app:
+        gr.Markdown("# 🎵 Text2Music")
 
         with gr.Accordion("About", open=False):
-            gr.Markdown(
-                """
-            # Text to Music
-            This app uses [MusicLDM](https://huggingface.co/docs/diffusers/main/en/api/pipelines/musicldm) to generate music from text.
-
-            ## How to use it?
-            1. Describe the music you want to generate in the `Enter Prompt` section.
-            2. Adjust the settings or leave them as default.
-            3. Click on `Generate Music` to generate the music.
-                - You can listen to the generated music in the `Generated Music Preview`.
-            """
-            )
+            gr.Markdown(DESCRIPTION)
 
         # Text which will be converted to speech
         with gr.Group():
